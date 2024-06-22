@@ -1,0 +1,64 @@
+import pandas as pd
+from datetime import datetime
+import joblib
+import requests
+
+print("Starting Volume Forecasting script...")
+
+# Load the model
+model_path = "C:/Users/ISynesius/Py Projects/trained_model.pkl"
+try:
+    model = joblib.load(model_path)
+    print("Model file found. Loading the model...")
+    print("Model loaded successfully.")
+except FileNotFoundError:
+    print(f"The model file {model_path} was not found. Ensure it is in the correct directory.")
+    exit()
+
+# Fetch the weather forecast
+api_key = ''
+location = 'Nottingham, UK'
+url = f'http://api.openweathermap.org/data/2.5/forecast?q={location}&appid={api_key}&units=metric'
+
+print(f"Requesting URL: {url}")
+response = requests.get(url)
+if response.status_code != 200:
+    print(f"Failed to fetch weather data. HTTP Status code: {response.status_code}")
+    exit()
+data = response.json()
+
+# Process the weather data
+weather_list = data['list']
+weather_data = []
+
+for entry in weather_list:
+    date_str = entry['dt_txt']
+    date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+    temperature = entry['main']['temp']
+    weather_data.append([date, temperature])
+
+weather_df = pd.DataFrame(weather_data, columns=['date', 'temperature'])
+
+# Aggregate weather data by day
+weather_df['day'] = weather_df['date'].dt.day
+weather_df['month'] = weather_df['date'].dt.month
+weather_df['year'] = weather_df['date'].dt.year
+daily_weather = weather_df.groupby(['year', 'month', 'day']).agg({'temperature': 'mean'}).reset_index()
+daily_weather['day_of_week'] = daily_weather['day'] % 7
+daily_weather['week_of_year'] = daily_weather.apply(lambda x: x['date'].isocalendar()[1], axis=1)
+
+# Predict volumes using the model
+X = daily_weather[['temperature', 'day', 'day_of_week', 'week_of_year', 'month', 'year']]
+predicted_volumes = model.predict(X)
+daily_weather['predicted_volume'] = predicted_volumes
+
+# Calculate revenue forecast
+daily_weather['revenue_forecast'] = daily_weather['predicted_volume'] * 0.159
+
+# Save the forecast to a new Excel file
+forecasted_file_path = "forecasted_volume.xlsx"
+daily_weather.to_excel(forecasted_file_path, index=False)
+
+print("Forecasting completed successfully:")
+print(daily_weather[['date', 'temperature', 'predicted_volume', 'revenue_forecast']])
+print(f"Forecasted data saved to {forecasted_file_path}")

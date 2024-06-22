@@ -1,0 +1,25 @@
+import pandas as pd
+from datetime import datetime
+
+# Load data
+file_path = r'C:\Users\ISynesius\Py Projects\Data.xlsx'
+data = pd.read_excel(file_path)
+print(f"Loading data from: {file_path}")
+
+# Ensure the data is sorted by date
+data = data.sort_values('date')
+print("Data loaded successfully. Sample data:")
+print(data.head())
+
+# Preprocess data
+data['date'] = pd.to_datetime(data['date'])
+data['day'] = data['date'].dt.day
+data['day_of_week'] = data['date'].dt.dayofweek
+data['week_of_year'] = data['date'].dt.isocalendar().week
+data['month'] = data['date'].dt.month
+data['year'] = data['date'].dt.year
+
+# Save preprocessed data
+preprocessed_file_path = r'C:\Users\ISynesius\Py Projects\Preprocessed_Data.xlsx'
+data.to_excel(preprocessed_file_path, index=False)
+print(f"Preprocessed data saved to {preprocessed_file_path}")
