@@ -1,7 +1,27 @@
-# GitHub Codespaces ♥️ Jupyter Notebooks
+# Forecasting Volume and Revenue with Machine Learning
 
-Welcome to your shiny new codespace! We've got everything fired up and running for you to explore Python and Jupyter notebooks.
+This repository contains scripts for forecasting daily volume and revenue based on weather data using machine learning. The workflow involves loading and preprocessing data, feature engineering, model training, model evaluation, and volume forecasting. 
 
-You've got a blank canvas to work on from a git perspective as well. There's a single initial commit with what you're seeing right now - where you go from here is up to you!
+## Repository Structure
 
-Everything you do here is contained within this one codespace. There is no repository on GitHub yet. If and when you’re ready you can click "Publish Branch" and we’ll create your repository and push up your project. If you were just exploring then and have no further need for this code then you can simply delete your codespace and it's gone forever.
+- `Load & Preprocess data.py`: Script to load raw data, preprocess it, and save the cleaned data.
+- `Model training.py`: Script to train a machine learning model using the preprocessed data.
+- `Model evaluation.py`: Script to evaluate the trained machine learning model.
+- `Volume Forecasting.py`: Script to forecast daily volume and revenue using the trained model and weather data.
+
+## Workflow
+
+### 1. Load and Preprocess Data
+
+**Script**: `Load & Preprocess data.py`
+
+**Purpose**: Load raw data from an Excel file, preprocess it (convert date columns to datetime format), and save the cleaned data to another Excel file.
+
+**Steps**:
+- Load data from `Data.xlsx`.
+- Convert the 'date' column to datetime format.
+- Save the preprocessed data to `Preprocessed_Data.xlsx`.
+
+**Sample Usage**:
+```bash
+python "Load & Preprocess data.py"
